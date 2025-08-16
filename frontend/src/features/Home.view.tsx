@@ -44,20 +44,25 @@ export const HomeView = () => {
   const showOnboardingFlow = forceOnboarding || !onboardingDoneQuery.data
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
-        <div className="md:col-span-4">
+    <div className="w-full px-4 md:py-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-[280px_1fr]">
+        <div>
+          <div className="rounded-2xl bg-black p-5 mb-4 text-white shadow-sm">
+            <div className="text-xl font-semibold">
+              <img src="/lemove_logo.png" alt="lemove logo" className="h-10 w-auto inline-block" />
+            </div>
+          </div>
           <Sidebar
-            current={activeStep}
-            completed={stepCompletion}
-            percent={completionPercent}
-            onNavigate={(idx: number) => {
+            activeStep={activeStep}
+            stepCompletion={stepCompletion}
+            completionPercent={completionPercent}
+            onStepNavigate={(idx: number) => {
               if (idx <= highestUnlockedStep) setActiveStep(idx)
             }}
           />
         </div>
-        <div className="md:col-span-8">
-      {isOnboardingComplete && !showOnboardingFlow ? (
+        <div className="w-full max-w-3xl mx-auto">
+          {isOnboardingComplete && !showOnboardingFlow ? (
             <div className="space-y-6">
               <div className="space-y-6 rounded-2xl">
                 <DashboardStats />
@@ -77,21 +82,21 @@ export const HomeView = () => {
             </div>
           ) : (
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        {activeStep === 0 && (
+              {activeStep === 0 && (
                 <OldAddress
                   value={move.oldAddress}
                   onChange={(a) => actions.setMove({ oldAddress: a })}
-          onNext={() => setActiveStep(1)}
+                  onNext={() => setActiveStep(1)}
                 />
               )}
-        {activeStep === 1 && (
+              {activeStep === 1 && (
                 <NewAddress
                   value={move.newAddress}
                   onChange={(a) => actions.setMove({ newAddress: a })}
-          onNext={() => setActiveStep(2)}
+                  onNext={() => setActiveStep(2)}
                 />
               )}
-        {activeStep === 2 && (
+              {activeStep === 2 && (
                 <MoveDate
                   alreadyMoved={!!move.alreadyMoved}
                   date={move.moveDate ?? ''}
