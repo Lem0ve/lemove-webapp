@@ -1,0 +1,52 @@
+import { Building2 } from 'lucide-react'
+import { useMemo } from 'react'
+import { useHome } from '../Home.context'
+
+export const DashboardStats = () => {
+  const { connections } = useHome()
+
+  const kpi = useMemo(() => {
+    const total = connections.length
+    const sent = connections.filter((c) => c.status === 'sent').length
+    const confirmed = connections.filter((c) => c.status === 'confirmed' || c.status === 'manual_done').length
+    const open = total - confirmed
+    return { total, sent, confirmed, open }
+  }, [connections])
+
+  const progress = useMemo(() => {
+    if (connections.length === 0) return 0
+    const done = connections.filter((c) => c.status === 'confirmed' || c.status === 'manual_done').length
+    return Math.round((done / connections.length) * 100)
+  }, [connections])
+
+  const KPI = ({ label, value, hint }: { label: string; value: string; hint?: string }) => (
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
+      <div className="mt-1 text-2xl font-semibold text-gray-900">{value}</div>
+      {hint && <div className="mt-1 text-xs text-gray-500">{hint}</div>}
+    </div>
+  )
+
+  const Section = ({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) => (
+    <section className="space-y-3">
+      <div>
+        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
+        {subtitle && <p className="text-sm text-gray-600">{subtitle}</p>}
+      </div>
+      {children}
+    </section>
+  )
+
+  return (
+    <div className="space-y-6">
+      <Section title="Übersicht" subtitle="Relevante Kennzahlen dieses Umzugs.">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <KPI label="Gesamt" value={String(kpi.total)} hint="Anzahl Verbindungen" />
+          <KPI label="Gesendet" value={String(kpi.sent)} hint="ohne Rückmeldung" />
+          <KPI label="Bestätigt" value={String(kpi.confirmed)} />
+          <KPI label="Offen" value={String(kpi.open)} />
+        </div>
+      </Section>
+    </div>
+  )
+}
