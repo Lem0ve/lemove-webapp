@@ -1,4 +1,3 @@
-import { Building2 } from 'lucide-react'
 import { useMemo } from 'react'
 import { useHome } from '../Home.context'
 
@@ -13,11 +12,7 @@ export const DashboardStats = () => {
     return { total, sent, confirmed, open }
   }, [connections])
 
-  const progress = useMemo(() => {
-    if (connections.length === 0) return 0
-    const done = connections.filter((c) => c.status === 'confirmed' || c.status === 'manual_done').length
-    return Math.round((done / connections.length) * 100)
-  }, [connections])
+  // Progress could be displayed later as a bar; compute on demand then.
 
   const KPI = ({ label, value, hint }: { label: string; value: string; hint?: string }) => (
     <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

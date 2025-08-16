@@ -1,11 +1,4 @@
-export type ProviderCategory =
-  | 'Bank'
-  | 'Versicherung'
-  | 'Arbeitgeber'
-  | 'Telekom'
-  | 'Energie'
-  | 'Gym'
-  | 'Sonstige'
+export type ProviderCategory = 'Konten' | 'Versicherungen' | 'Abos' | 'Sonstiges'
 
 export type ConnectionStatus = 'not_contacted' | 'sent' | 'confirmed' | 'manual_done'
 
