@@ -67,7 +67,6 @@ export const HomeView = () => {
               <div className="space-y-6 rounded-2xl">
                 <DashboardStats />
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-semibold text-gray-900">Verbindungen</h3>
                 </div>
                 <Connections />
                 <div className="flex justify-end">
