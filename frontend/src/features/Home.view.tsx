@@ -7,9 +7,12 @@ import { NewAddress } from './components/NewAddress.component'
 import { MoveDate } from './components/MoveDate.component'
 import { DashboardStats } from './components/DashboardStats.component'
 import { Connections } from './components/Connections.component'
+import { ProviderPickerInline } from './components/ProviderPickerInline.component'
+import { ConfirmDetailsStep } from './components/ConfirmDetailsStep.component'
+import { PROVIDERS } from './components/ProviderCatalog'
 
 export const HomeView = () => {
-  const { move, actions } = useHome()
+  const { move, actions, connections } = useHome()
   const queryClient = useQueryClient()
   const [forceOnboarding] = useState(false)
 
@@ -42,6 +45,9 @@ export const HomeView = () => {
   const [activeStep, setActiveStep] = useState(0)
   const highestUnlockedStep = stepCompletion.old ? (stepCompletion.new ? 2 : 1) : 0
   const showOnboardingFlow = forceOnboarding || !onboardingDoneQuery.data
+  // UI mode after onboarding: 'dashboard' -> show stats + connections; 'pick-providers' -> inline picker; 'confirm' -> details confirm
+  const [uiMode, setUiMode] = useState<'dashboard' | 'pick-providers' | 'confirm'>('dashboard')
+  const [pendingProviderIds, setPendingProviderIds] = useState<string[]>([])
 
   return (
     <div className="w-full px-4 md:py-6">
@@ -49,7 +55,9 @@ export const HomeView = () => {
         <div>
           <div className="rounded-2xl bg-black p-5 mb-4 text-white shadow-sm">
             <div className="text-xl font-semibold">
-              <img src="/lemove_logo.png" alt="lemove logo" className="h-10 w-auto inline-block" />
+              <a href="/" className="flex items-center">
+                <img src="/lemove_logo.png" alt="lemove logo" className="h-10 w-auto inline-block" />
+              </a>
             </div>
           </div>
           <Sidebar
@@ -64,20 +72,39 @@ export const HomeView = () => {
         <div className="w-full max-w-3xl mx-auto">
           {isOnboardingComplete && !showOnboardingFlow ? (
             <div className="space-y-6">
-              <div className="space-y-6 rounded-2xl">
-                <DashboardStats />
-                <div className="flex items-center justify-between">
+              {uiMode === 'dashboard' && (
+                <div className="space-y-6 rounded-2xl">
+                  <DashboardStats />
+                  <Connections onStartAdd={() => setUiMode('pick-providers')} />
                 </div>
-                <Connections />
-                <div className="flex justify-end">
-                  <button
-                    className="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black"
-                    onClick={() => actions.startDispatch()}
-                  >
-                    Schritte starten
-                  </button>
-                </div>
-              </div>
+              )}
+              {uiMode === 'pick-providers' && (
+                <ProviderPickerInline
+                  onCancel={() => setUiMode('dashboard')}
+                  onConfirm={(ids) => { setPendingProviderIds(ids); setUiMode('confirm') }}
+                />
+              )}
+              {uiMode === 'confirm' && (
+                <ConfirmDetailsStep
+                  selectedProviderIds={pendingProviderIds}
+                  onBack={() => setUiMode('pick-providers')}
+                  onSubmit={() => {
+                    // Add providers now, then start dispatch
+                    const existingNames = new Set<string>(connections.map(c => c.name.toLowerCase()))
+                    pendingProviderIds.forEach(id => {
+                      const p = PROVIDERS.find(x => x.id === id)
+                      if (!p) return
+                      if (!existingNames.has(p.name.toLowerCase())) {
+                        actions.addConnection({ name: p.name, category: p.category, customerId: undefined })
+                        existingNames.add(p.name.toLowerCase())
+                      }
+                    })
+                    setPendingProviderIds([])
+                    setUiMode('dashboard')
+                    actions.startDispatch()
+                  }}
+                />
+              )}
             </div>
           ) : (
             <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">

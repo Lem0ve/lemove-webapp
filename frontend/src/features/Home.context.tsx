@@ -3,7 +3,17 @@ import type { Connection, ConnectionStatus } from './Home.interactor'
 import { HomeInteractor } from './Home.interactor'
 
 export type Address = { street: string; postalCode: string; city: string }
-export type MoveState = { oldAddress: Address; newAddress: Address; moveDate?: string; proofFile?: File | null; alreadyMoved?: boolean }
+export type MoveState = {
+  oldAddress: Address
+  newAddress: Address
+  moveDate?: string
+  proofFile?: File | null
+  alreadyMoved?: boolean
+  fullName?: string
+  email?: string
+  phone?: string
+  birthday?: string
+}
 
 type HomeState = {
   move: MoveState
@@ -27,7 +37,11 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
     newAddress: { street: '', postalCode: '', city: '' },
     moveDate: '',
     proofFile: null,
-    alreadyMoved: false,
+  alreadyMoved: false,
+  fullName: '',
+  email: '',
+  phone: '',
+  birthday: '',
   })
   const [connections, setConnections] = useState<Connection[]>([])
   const [isDispatching, setIsDispatching] = useState(false)

@@ -1,0 +1,124 @@
+import { useMemo, useState } from 'react'
+import { useHome } from '../Home.context'
+import { PROVIDERS } from './ProviderCatalog'
+
+ type Props = {
+  selectedProviderIds: string[]
+  onBack: () => void
+  onSubmit: (confirmed: { fullName: string; email: string; phone?: string; birthday?: string }) => void
+}
+
+export const ConfirmDetailsStep = ({ selectedProviderIds, onBack, onSubmit }: Props) => {
+  const { move, actions } = useHome()
+  // Personal data
+  const [fullName, setFullName] = useState(move.fullName ?? '')
+  const [email, setEmail] = useState(move.email ?? '')
+  const [phone, setPhone] = useState(move.phone ?? '')
+  const [birthday, setBirthday] = useState(move.birthday ?? '')
+  // Addresses and move
+  const [oldStreet, setOldStreet] = useState(move.oldAddress.street)
+  const [oldPostal, setOldPostal] = useState(move.oldAddress.postalCode)
+  const [oldCity, setOldCity] = useState(move.oldAddress.city)
+  const [newStreet, setNewStreet] = useState(move.newAddress.street)
+  const [newPostal, setNewPostal] = useState(move.newAddress.postalCode)
+  const [newCity, setNewCity] = useState(move.newAddress.city)
+  const [alreadyMoved, setAlreadyMoved] = useState(!!move.alreadyMoved)
+  const [moveDate, setMoveDate] = useState(move.moveDate ?? '')
+  const [accepted, setAccepted] = useState(false)
+
+  const selectedProviders = useMemo(() => selectedProviderIds.map(id => PROVIDERS.find(p => p.id === id)).filter(Boolean), [selectedProviderIds])
+
+  const isValid = fullName.trim().length > 0 && /.+@.+\..+/.test(email) && accepted
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl bg-white p-5 shadow-sm">
+        <h4 className="text-base font-semibold text-gray-900 mb-2">Alle Daten</h4>
+        <div className="grid grid-cols-1 gap-6">
+          <div>
+            <div className="mb-2 text-sm font-medium text-gray-900">Alte Adresse</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <input value={oldStreet} onChange={(e) => setOldStreet(e.target.value)} placeholder="Straße und Hausnummer" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+              <input value={oldPostal} onChange={(e) => setOldPostal(e.target.value)} placeholder="PLZ" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+              <input value={oldCity} onChange={(e) => setOldCity(e.target.value)} placeholder="Ort" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+          </div>
+          <div>
+            <div className="mb-2 text-sm font-medium text-gray-900">Neue Adresse</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <input value={newStreet} onChange={(e) => setNewStreet(e.target.value)} placeholder="Straße und Hausnummer" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+              <input value={newPostal} onChange={(e) => setNewPostal(e.target.value)} placeholder="PLZ" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+              <input value={newCity} onChange={(e) => setNewCity(e.target.value)} placeholder="Ort" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+          </div>
+          <div>
+            <div className="mb-2 text-sm font-medium text-gray-900">Umzug</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[auto_1fr] items-center">
+              <label className="flex items-center gap-2 text-sm text-gray-800">
+                <input type="checkbox" checked={alreadyMoved} onChange={(e) => setAlreadyMoved(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+                Bereits umgezogen
+              </label>
+              <input type="date" value={moveDate} onChange={(e) => setMoveDate(e.target.value)} disabled={alreadyMoved} className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-100" />
+            </div>
+          </div>
+          <div>
+            <div className="mb-2 text-sm font-medium text-gray-900">Kontakt</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Vollständiger Name" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="E-Mail" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+              <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Telefon (optional)" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+              <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} placeholder="Geburtstag" className="w-full rounded-xl border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-gray-900" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-white p-5 shadow-sm">
+        <h4 className="text-base font-semibold text-gray-900 mb-3">Ausgewählte Verbindungen</h4>
+        <div className="flex flex-wrap gap-3">
+          {selectedProviders.map((p) => (
+            <div key={p!.id} className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {p!.logoUrl ? (
+                <img src={p!.logoUrl} alt={p!.name} className="h-6 w-auto" />
+              ) : p!.domain ? (
+                <img src={`https://logo.clearbit.com/${p!.domain}`} alt={p!.name} className="h-6 w-auto" />
+              ) : (
+                <div className="h-6 w-6 rounded-full bg-gray-200" />
+              )}
+              <span className="text-sm text-gray-800">{p!.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <label className="flex items-center gap-3 text-sm text-gray-700">
+        <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="h-4 w-4 rounded border-gray-300" />
+        <span>Hiermit bestätige ich, dass meine Angaben korrekt sind und an die ausgewählten Anbieter übermittelt werden dürfen.</span>
+      </label>
+
+      <div className="flex items-center justify-between">
+        <button onClick={onBack} className="cursor-pointer rounded-xl px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Zurück</button>
+        <button
+          onClick={() => {
+            actions.setMove({
+              fullName,
+              email,
+              phone,
+              birthday,
+              oldAddress: { street: oldStreet, postalCode: oldPostal, city: oldCity },
+              newAddress: { street: newStreet, postalCode: newPostal, city: newCity },
+              alreadyMoved,
+              moveDate: alreadyMoved ? '' : moveDate,
+            })
+            onSubmit({ fullName, email, phone, birthday })
+          }}
+          disabled={!isValid}
+          className={`cursor-pointer inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold ${!isValid ? 'bg-gray-200 text-gray-500' : 'bg-gray-900 text-white hover:bg-black'}`}
+        >
+          Neue Adresse senden
+        </button>
+      </div>
+    </div>
+  )
+}
