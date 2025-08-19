@@ -40,7 +40,6 @@ export const HomeView = () => {
     [move]
   )
   const isOnboardingComplete = stepCompletion.old && stepCompletion.new && stepCompletion.date
-  const completionPercent = Math.round(((stepCompletion.old ? 1 : 0) + (stepCompletion.new ? 1 : 0) + (stepCompletion.date ? 1 : 0)) / 3 * 100)
 
   const [activeStep, setActiveStep] = useState(0)
   const highestUnlockedStep = stepCompletion.old ? (stepCompletion.new ? 2 : 1) : 0
@@ -63,7 +62,6 @@ export const HomeView = () => {
           <Sidebar
             activeStep={activeStep}
             stepCompletion={stepCompletion}
-            completionPercent={completionPercent}
             onStepNavigate={(idx: number) => {
               if (idx <= highestUnlockedStep) setActiveStep(idx)
             }}

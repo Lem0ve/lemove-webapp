@@ -1,11 +1,9 @@
-import { ProgressCircle } from './ProgressCircle.component'
 import { Home, House, CalendarDays, ChevronRight, ChevronLeft } from 'lucide-react'
 
 type StepKey = 'old' | 'new' | 'date'
 type SidebarProps = {
   activeStep: number
   stepCompletion: { old: boolean; new: boolean; date: boolean }
-  completionPercent: number
   onStepNavigate?: (index: number) => void
 }
 
@@ -15,14 +13,11 @@ const STEPS: Array<{ key: StepKey; label: string }> = [
   { key: 'date', label: 'Datum' },
 ]
 
-export const Sidebar = ({ activeStep, stepCompletion, completionPercent, onStepNavigate }: SidebarProps) => {
+export const Sidebar = ({ activeStep, stepCompletion, onStepNavigate }: SidebarProps) => {
   return (
     <aside className="flex h-full w-full flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
       <div>
         <h2 className="text-lg font-semibold tracking-tight text-gray-900">Umzug</h2>
-      </div>
-      <div className="flex items-center justify-center">
-        <ProgressCircle percent={completionPercent} />
       </div>
       <nav className="flex flex-col gap-2">
         {STEPS.map((step, idx) => {
