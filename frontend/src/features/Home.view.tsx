@@ -10,6 +10,7 @@ import { Connections } from './components/Connections.component'
 import { ProviderPickerInline } from './components/ProviderPickerInline.component'
 import { ConfirmDetailsStep } from './components/ConfirmDetailsStep.component'
 import { PROVIDERS } from './components/ProviderCatalog'
+import { EditProfilView } from './EditProfil.view'
 
 export const HomeView = () => {
   const { move, actions, connections } = useHome()
@@ -47,6 +48,7 @@ export const HomeView = () => {
   // UI mode after onboarding: 'dashboard' -> show stats + connections; 'pick-providers' -> inline picker; 'confirm' -> details confirm
   const [uiMode, setUiMode] = useState<'dashboard' | 'pick-providers' | 'confirm'>('dashboard')
   const [pendingProviderIds, setPendingProviderIds] = useState<string[]>([])
+  const [showEditProfile, setShowEditProfile] = useState(false)
 
   return (
     <div className="w-full px-4 md:py-6">
@@ -62,6 +64,7 @@ export const HomeView = () => {
           <Sidebar
             activeStep={activeStep}
             stepCompletion={stepCompletion}
+            onEditProfile={() => setShowEditProfile(true)}
             onStepNavigate={(idx: number) => {
               if (idx <= highestUnlockedStep) setActiveStep(idx)
             }}
@@ -135,6 +138,9 @@ export const HomeView = () => {
           )}
         </div>
       </div>
+      {showEditProfile && (
+        <EditProfilView onClose={() => setShowEditProfile(false)} />
+      )}
     </div>
   )
 }

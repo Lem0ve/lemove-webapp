@@ -1,10 +1,11 @@
-import { Home, House, CalendarDays, ChevronRight, ChevronLeft } from 'lucide-react'
+import { Home, House, CalendarDays, ChevronRight, ChevronLeft, Pencil } from 'lucide-react'
 
 type StepKey = 'old' | 'new' | 'date'
 type SidebarProps = {
   activeStep: number
   stepCompletion: { old: boolean; new: boolean; date: boolean }
   onStepNavigate?: (index: number) => void
+  onEditProfile?: () => void
 }
 
 const STEPS: Array<{ key: StepKey; label: string }> = [
@@ -13,11 +14,20 @@ const STEPS: Array<{ key: StepKey; label: string }> = [
   { key: 'date', label: 'Datum' },
 ]
 
-export const Sidebar = ({ activeStep, stepCompletion, onStepNavigate }: SidebarProps) => {
+export const Sidebar = ({ activeStep, stepCompletion, onStepNavigate, onEditProfile }: SidebarProps) => {
   return (
     <aside className="flex h-full w-full flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div>
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold tracking-tight text-gray-900">Umzug</h2>
+        <button
+          type="button"
+          onClick={onEditProfile}
+          className="cursor-pointer inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+          aria-label="Profil bearbeiten"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+          Edit
+        </button>
       </div>
       <nav className="flex flex-col gap-2">
         {STEPS.map((step, idx) => {
