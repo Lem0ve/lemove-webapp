@@ -6,7 +6,6 @@
 		<groupId>lemove</groupId>
 		<artifactId>lemove-webapp</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>lemove</groupId>
 	<artifactId>backend</artifactId>
@@ -60,6 +59,17 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<!-- warum bracuhe ich hier einen scope für die Dependency? -->
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 

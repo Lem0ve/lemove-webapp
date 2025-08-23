@@ -10,7 +10,6 @@ frontend/dist/
 frontend/.vite/
 
 # Backend (Gradle)
-backend/.gradle/
 backend/build/
 backend/out/
 backend/*.iml
