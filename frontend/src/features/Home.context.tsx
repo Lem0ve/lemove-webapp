@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useRef, useState, useEffect } from 'react'
-import type { Connection, ConnectionStatus } from './Home.interactor'
+import type { Partner, PartnerStatus } from './Home.interactor'
 import { HomeInteractor } from './Home.interactor'
 
 export type Address = {
@@ -22,15 +22,15 @@ export type MoveState = {
 
 type HomeState = {
   move: MoveState
-  connections: Connection[]
+  partners: Partner[]
   isDispatching: boolean
 }
 
 type HomeActions = {
   setMove: (patch: Partial<MoveState>) => void
-  addConnection: (c: Omit<Connection, 'id' | 'status'> & { status?: ConnectionStatus }) => void
-  updateConnection: (id: string, patch: Partial<Connection>) => void
-  removeConnection: (id: string) => void
+  addPartner: (partner: Omit<Partner, 'id' | 'status'> & { status?: PartnerStatus }) => void
+  updatePartner: (id: string, patch: Partial<Partner>) => void
+  removePartner: (id: string) => void
   startDispatch: () => void
 }
 
@@ -38,7 +38,7 @@ const HomeCtx = createContext<(HomeState & { actions: HomeActions }) | null>(nul
 
 export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   const STORAGE_KEY = 'move_state_v1'
-  const CONNECTIONS_KEY = 'connections_v1'
+  const PARTNERS_KEY = 'partners_v1'
   const defaultMove: MoveState = {
     oldAddress: { street: '', postalCode: '', city: '' },
     newAddress: { street: '', postalCode: '', city: '' },
@@ -68,16 +68,16 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
       return defaultMove
     }
   })
-  const [connections, setConnections] = useState<Connection[]>(() => {
+  const [partners, setPartners] = useState<Partner[]>(() => {
     try {
-      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(CONNECTIONS_KEY) : null
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(PARTNERS_KEY) : null
       if (!raw) return []
       const parsed = JSON.parse(raw)
       if (!Array.isArray(parsed)) return []
       return parsed
         .filter((item) => item && typeof item === 'object')
         .map((item) => {
-          const safe: Connection = {
+          const safe: Partner = {
             id: String(item.id ?? ''),
             providerId: item.providerId ? String(item.providerId) : undefined,
             name: String(item.name ?? ''),
@@ -95,18 +95,18 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   const [isDispatching, setIsDispatching] = useState(false)
   const timerRef = useRef<number | null>(null)
   const persistTimerRef = useRef<number | null>(null)
-  const connectionsPersistTimerRef = useRef<number | null>(null)
+  const partnersPersistTimerRef = useRef<number | null>(null)
 
-  const setMove = (patch: Partial<MoveState>) => setMoveState((m) => ({ ...m, ...patch }))
+  const setMove = (patch: Partial<MoveState>) => setMoveState((current) => ({ ...current, ...patch }))
 
-  const addConnection: HomeActions['addConnection'] = (input) => {
-    setConnections((prev) => HomeInteractor.add(prev, input))
+  const addPartner: HomeActions['addPartner'] = (input) => {
+    setPartners((previous) => HomeInteractor.add(previous, input))
   }
-  const updateConnection: HomeActions['updateConnection'] = (id, patch) => {
-    setConnections((prev) => HomeInteractor.update(prev, id, patch))
+  const updatePartner: HomeActions['updatePartner'] = (id, patch) => {
+    setPartners((previous) => HomeInteractor.update(previous, id, patch))
   }
-  const removeConnection: HomeActions['removeConnection'] = (id) => {
-    setConnections((prev) => HomeInteractor.remove(prev, id))
+  const removePartner: HomeActions['removePartner'] = (id) => {
+    setPartners((previous) => HomeInteractor.remove(previous, id))
   }
 
   const isAddressComplete = useMemo(() => {
@@ -115,19 +115,19 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [move])
 
   const startDispatch = () => {
-    if (!isAddressComplete || connections.length === 0) return
+    if (!isAddressComplete || partners.length === 0) return
     setIsDispatching(true)
-    setConnections((prev) => HomeInteractor.beginDispatch(prev))
+    setPartners((previous) => HomeInteractor.beginDispatch(previous))
     const tick = () => {
-      setConnections((prev) => HomeInteractor.tickDispatch(prev))
-      setConnections((currentConnections) => {
-        const anyLeft = currentConnections.some((connection) => connection.status === 'sent' || connection.status === 'not_contacted')
+      setPartners((previous) => HomeInteractor.tickDispatch(previous))
+      setPartners((currentPartners) => {
+        const anyLeft = currentPartners.some((partner) => partner.status === 'sent' || partner.status === 'not_contacted')
         if (!anyLeft) {
           if (timerRef.current) window.clearInterval(timerRef.current)
           timerRef.current = null
           setIsDispatching(false)
         }
-        return currentConnections
+        return currentPartners
       })
     }
     timerRef.current = window.setInterval(tick, 1200)
@@ -136,7 +136,7 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => () => {
     if (timerRef.current) window.clearInterval(timerRef.current)
     if (persistTimerRef.current) window.clearTimeout(persistTimerRef.current)
-    if (connectionsPersistTimerRef.current) window.clearTimeout(connectionsPersistTimerRef.current)
+    if (partnersPersistTimerRef.current) window.clearTimeout(partnersPersistTimerRef.current)
   }, [])
 
   useEffect(() => {
@@ -150,16 +150,16 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [move])
 
   useEffect(() => {
-    if (connectionsPersistTimerRef.current) window.clearTimeout(connectionsPersistTimerRef.current)
-    connectionsPersistTimerRef.current = window.setTimeout(() => {
+    if (partnersPersistTimerRef.current) window.clearTimeout(partnersPersistTimerRef.current)
+    partnersPersistTimerRef.current = window.setTimeout(() => {
       try {
-        window.localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(connections))
+        window.localStorage.setItem(PARTNERS_KEY, JSON.stringify(partners))
       } catch { }
     }, 200)
-  }, [connections])
+  }, [partners])
 
   return (
-    <HomeCtx.Provider value={{ move, connections, isDispatching, actions: { setMove, addConnection, updateConnection, removeConnection, startDispatch } }}>
+    <HomeCtx.Provider value={{ move, partners, isDispatching, actions: { setMove, addPartner, updatePartner, removePartner, startDispatch } }}>
       {children}
     </HomeCtx.Provider>
   )

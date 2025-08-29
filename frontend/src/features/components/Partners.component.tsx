@@ -1,18 +1,18 @@
 import { useHome } from '../Home.context'
-import { ConnectionCard } from './ConnectionCard.component'
+import { PartnerCard } from './PartnerCard.component'
 import { Plus } from 'lucide-react'
 
 type Props = { onStartAdd?: () => void }
 
-export const Connections = ({ onStartAdd }: Props) => {
-    const { connections, actions } = useHome()
+export const Partners = ({ onStartAdd }: Props) => {
+    const { partners, actions } = useHome()
 
     return (
         <div className="space-y-4">
-            <h3 className="text-base font-semibold text-gray-900">Meine Verbindungen</h3>
+            <h3 className="text-base font-semibold text-gray-900">Meine Partner</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {connections.map((connection) => (
-                    <ConnectionCard key={connection.id} item={connection} onUpdate={(patch) => actions.updateConnection(connection.id, patch)} onRemove={() => actions.removeConnection(connection.id)} />
+                {partners.map((partner) => (
+                    <PartnerCard key={partner.id} item={partner} onUpdate={(patch) => actions.updatePartner(partner.id, patch)} onRemove={() => actions.removePartner(partner.id)} />
                 ))}
 
                 {/* Add tile at the end */}

@@ -1,14 +1,14 @@
-export type ProviderCategory = 'Konten' | 'Versicherungen' | 'Abos' | 'Sonstiges'
+export type PartnerCategory = 'Konten' | 'Versicherungen' | 'Abos' | 'Sonstiges'
 
-export type ProviderItem = {
+export type PartnerItem = {
   id: string
   name: string
-  category: ProviderCategory
+  category: PartnerCategory
   domain?: string
   logoUrl?: string
 }
 
-export const PROVIDERS: ProviderItem[] = [
+export const PARTNERS: PartnerItem[] = [
   // Konten (Banken)
   { id: 'nordlb', name: 'NORD/LB', category: 'Konten', domain: 'nordlb.de' },
   { id: 'sparkasse', name: 'Sparkasse', category: 'Konten', domain: 'sparkasse.de' },
@@ -114,7 +114,7 @@ export const PROVIDERS: ProviderItem[] = [
 
 ]
 
-export const CATEGORIES: ProviderCategory[] = ['Konten', 'Versicherungen', 'Abos', 'Sonstiges']
+export const CATEGORIES: PartnerCategory[] = ['Konten', 'Versicherungen', 'Abos', 'Sonstiges']
 
 export const brandLogoUrl = (domain: string, cssPx = 64, opts?: { dpr?: number; format?: 'svg' | 'png' }) => {
   const envAny = (import.meta as any)

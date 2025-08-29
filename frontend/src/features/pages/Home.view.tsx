@@ -3,14 +3,14 @@ import { EditProfilView } from '../pages/EditProfil.view'
 import { Sidebar } from '../components/Sidebar.component'
 import { useState } from 'react'
 import { ConfirmDetailsStep } from '../components/ConfirmDetailsStep.component'
-import { Connections } from '../components/Connections.component'
+import { Partners } from '../components/Partners.component'
 import { DashboardStats } from '../components/DashboardStats.component'
-import { PROVIDERS } from '../components/ProviderCatalog'
-import { ProviderPickerInline } from '../components/ProviderPickerInline.component'
+import { PARTNERS } from '../components/PartnerCatalog'
+import { PartnerPickerInline } from '../components/PartnerPickerInline.component'
 import { useHome } from '../Home.context'
 
 export const HomeView = () => {
-  const { move, actions, connections } = useHome()
+  const { move, actions, partners } = useHome()
   const [forceOnboarding] = useState(false)
 
   const onboardingDone = (() => {
@@ -63,11 +63,11 @@ export const HomeView = () => {
               {uiMode === 'dashboard' && (
                 <div className="space-y-6 rounded-2xl">
                   <DashboardStats />
-                  <Connections onStartAdd={() => setUiMode('pick-providers')} />
+                  <Partners onStartAdd={() => setUiMode('pick-providers')} />
                 </div>
               )}
               {uiMode === 'pick-providers' && (
-                <ProviderPickerInline
+                <PartnerPickerInline
                   onCancel={() => setUiMode('dashboard')}
                   onConfirm={(ids) => { setPendingProviderIds(ids); setUiMode('confirm') }}
                 />
@@ -77,16 +77,16 @@ export const HomeView = () => {
                   selectedProviderIds={pendingProviderIds}
                   onBack={() => setUiMode('pick-providers')}
                   onSubmit={() => {
-                    const existingProviderIds = new Set<string>(connections.map(connection => (connection.providerId ?? '').toLowerCase()).filter(Boolean))
-                    const legacyNames = new Set<string>(connections.filter(connection => !connection.providerId).map(connection => connection.name.toLowerCase()))
+                    const existingProviderIds = new Set<string>(partners.map(partner => (partner.providerId ?? '').toLowerCase()).filter(Boolean))
+                    const legacyNames = new Set<string>(partners.filter(partner => !partner.providerId).map(partner => partner.name.toLowerCase()))
                     pendingProviderIds.forEach(providerId => {
-                      const provider = PROVIDERS.find(providerItem => providerItem.id === providerId)
+                      const provider = PARTNERS.find(providerItem => providerItem.id === providerId)
                       if (!provider) return
                       const idKey = provider.id.toLowerCase()
                       const nameKey = provider.name.toLowerCase()
                       const exists = existingProviderIds.has(idKey) || legacyNames.has(nameKey)
                       if (exists) return
-                      actions.addConnection({ providerId: provider.id, name: provider.name, category: provider.category, customerId: undefined })
+                      actions.addPartner({ providerId: provider.id, name: provider.name, category: provider.category, customerId: undefined })
                       existingProviderIds.add(idKey)
                     })
                     setPendingProviderIds([])

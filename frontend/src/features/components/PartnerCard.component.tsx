@@ -1,13 +1,13 @@
 import { Trash2 } from 'lucide-react'
-import type { Connection } from '../Home.interactor'
-import { StatusSelector } from './StatusSelector.component'
-import { StatusIcon, statusBadgeColor, clsx } from './ConnectionStatus.utils'
-import { PROVIDERS, brandLogoUrl } from './ProviderCatalog'
+import type { Partner } from '../Home.interactor'
+import { PartnerStatusSelector } from './PartnerStatusSelector.component'
+import { StatusIcon, statusBadgeColor, clsx } from './PartnerStatus.utils'
+import { PARTNERS, brandLogoUrl } from './PartnerCatalog'
 
-export const ConnectionCard = ({ item, onUpdate, onRemove }: { item: Connection; onUpdate: (patch: Partial<Connection>) => void; onRemove: () => void }) => {
+export const PartnerCard = ({ item, onUpdate, onRemove }: { item: Partner; onUpdate: (patch: Partial<Partner>) => void; onRemove: () => void }) => {
   const provider = item.providerId
-    ? PROVIDERS.find((providerItem) => providerItem.id === item.providerId)
-    : PROVIDERS.find((providerItem) => providerItem.name.toLowerCase() === item.name.toLowerCase())
+    ? PARTNERS.find((providerItem) => providerItem.id === item.providerId)
+    : PARTNERS.find((providerItem) => providerItem.name.toLowerCase() === item.name.toLowerCase())
   const logoSrc = provider?.logoUrl || (provider?.domain ? brandLogoUrl(provider.domain, 24, { format: 'svg' }) : undefined)
 
   return (
@@ -48,7 +48,7 @@ export const ConnectionCard = ({ item, onUpdate, onRemove }: { item: Connection;
         </div>
       </div>
       <div className="mt-4 flex items-center justify-between cursor-pointer">
-        <StatusSelector value={item.status} onChange={(s) => onUpdate({ status: s })} />
+        <PartnerStatusSelector value={item.status} onChange={(status) => onUpdate({ status })} />
       </div>
     </div>
   )

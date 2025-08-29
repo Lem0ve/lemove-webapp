@@ -1,11 +1,11 @@
 import { Check, CheckCircle2, Circle, Send } from 'lucide-react'
-import type { ConnectionStatus } from '../Home.interactor'
+import type { PartnerStatus } from '../Home.interactor'
 
 export function clsx(...classes: Array<string | undefined | false>) {
   return classes.filter(Boolean).join(' ')
 }
 
-export function statusBadgeColor(status: ConnectionStatus) {
+export function statusBadgeColor(status: PartnerStatus) {
   switch (status) {
     case 'not_contacted':
       return 'bg-gray-100 text-gray-700 ring-1 ring-gray-200'
@@ -17,7 +17,7 @@ export function statusBadgeColor(status: ConnectionStatus) {
   }
 }
 
-export const StatusIcon = ({ status, className }: { status: ConnectionStatus; className?: string }) => {
+export const StatusIcon = ({ status, className }: { status: PartnerStatus; className?: string }) => {
   switch (status) {
     case 'not_contacted':
       return <Circle className={className ?? 'h-4 w-4'} />

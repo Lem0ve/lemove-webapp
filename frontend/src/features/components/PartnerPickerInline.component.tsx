@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Check, Search } from 'lucide-react'
-import { CATEGORIES, PROVIDERS, brandLogoUrl, type ProviderCategory } from './ProviderCatalog'
+import { CATEGORIES, PARTNERS, brandLogoUrl, type PartnerCategory } from './PartnerCatalog'
 import { useHome } from '../Home.context'
 
 type Props = {
@@ -8,9 +8,9 @@ type Props = {
   onConfirm: (selectedIds: string[]) => void
 }
 
-export const ProviderPickerInline = ({ onCancel, onConfirm }: Props) => {
+export const PartnerPickerInline = ({ onCancel, onConfirm }: Props) => {
   const { partners } = useHome()
-  const [activeCategory, setActiveCategory] = useState<ProviderCategory | 'Alle'>('Alle')
+  const [activeCategory, setActiveCategory] = useState<PartnerCategory | 'Alle'>('Alle')
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
@@ -21,10 +21,10 @@ export const ProviderPickerInline = ({ onCancel, onConfirm }: Props) => {
     })
     return ids
   }, [partners])
-  const existingNamesLower = useMemo(() => new Set(partners.filter(c => !c.providerId).map(c => c.name.toLowerCase())), [partners])
+  const existingNamesLower = useMemo(() => new Set(partners.filter(partner => !partner.providerId).map(partner => partner.name.toLowerCase())), [partners])
 
   const filtered = useMemo(() => {
-    const list = activeCategory === 'Alle' ? PROVIDERS : PROVIDERS.filter(provider => provider.category === activeCategory)
+    const list = activeCategory === 'Alle' ? PARTNERS : PARTNERS.filter(provider => provider.category === activeCategory)
     const queryLower = query.trim().toLowerCase()
     return queryLower ? list.filter(provider => provider.name.toLowerCase().includes(queryLower)) : list
   }, [activeCategory, query])

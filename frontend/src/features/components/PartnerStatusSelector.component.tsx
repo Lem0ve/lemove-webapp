@@ -1,8 +1,8 @@
-import type { ConnectionStatus } from '../Home.interactor'
-import { clsx } from './ConnectionStatus.utils'
+import type { PartnerStatus } from '../Home.interactor'
+import { clsx } from './PartnerStatus.utils'
 import { Circle, Send, Check, CheckCircle2 } from 'lucide-react'
 
-export const StatusSelector = ({ value, onChange }: { value: ConnectionStatus; onChange: (status: ConnectionStatus) => void }) => (
+export const PartnerStatusSelector = ({ value, onChange }: { value: PartnerStatus; onChange: (status: PartnerStatus) => void }) => (
   <div className="flex items-center gap-1">
     <button title="Nicht kontaktiert" onClick={() => onChange('not_contacted')} className={clsx('rounded-lg p-2 ring-1', value === 'not_contacted' ? 'ring-gray-400' : 'ring-transparent hover:bg-gray-50 cursor-pointer')}>
       <Circle className="h-4 w-4" />

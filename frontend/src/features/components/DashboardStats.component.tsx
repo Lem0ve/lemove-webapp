@@ -2,15 +2,15 @@ import { useMemo } from 'react'
 import { useHome } from '../Home.context'
 
 export const DashboardStats = () => {
-  const { connections } = useHome()
+  const { partners } = useHome()
 
   const kpi = useMemo(() => {
-    const total = connections.length
-    const sent = connections.filter((connection) => connection.status === 'sent').length
-    const confirmed = connections.filter((connection) => connection.status === 'confirmed' || connection.status === 'manual_done').length
+    const total = partners.length
+    const sent = partners.filter((partner) => partner.status === 'sent').length
+    const confirmed = partners.filter((partner) => partner.status === 'confirmed' || partner.status === 'manual_done').length
     const open = total - confirmed
     return { total, sent, confirmed, open }
-  }, [connections])
+  }, [partners])
 
   // Progress could be displayed later as a bar; compute on demand then.
 
@@ -36,7 +36,7 @@ export const DashboardStats = () => {
     <div className="space-y-6">
       <Section title="Dashboard">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KPI label="Gesamt" value={String(kpi.total)} hint="Anzahl Verbindungen" />
+          <KPI label="Gesamt" value={String(kpi.total)} hint="Anzahl Partner" />
           <KPI label="Gesendet" value={String(kpi.sent)} hint="ohne Rückmeldung" />
           <KPI label="Bestätigt" value={String(kpi.confirmed)} />
           <KPI label="Offen" value={String(kpi.open)} />

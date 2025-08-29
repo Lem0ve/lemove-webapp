@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useHome } from '../Home.context'
-import { PROVIDERS, brandLogoUrl } from './ProviderCatalog'
+import { PARTNERS, brandLogoUrl } from './PartnerCatalog'
 
  type Props = {
   selectedProviderIds: string[]
@@ -26,7 +26,7 @@ export const ConfirmDetailsStep = ({ selectedProviderIds, onBack, onSubmit }: Pr
   const [moveDate, setMoveDate] = useState(move.moveDate ?? '')
   const [accepted, setAccepted] = useState(false)
 
-  const selectedProviders = selectedProviderIds.map(providerId => PROVIDERS.find(provider => provider.id === providerId)).filter(Boolean)
+  const selectedPartners = selectedProviderIds.map(providerId => PARTNERS.find(provider => provider.id === providerId)).filter(Boolean)
 
   const isValid = fullName.trim().length > 0 && /.+@.+\..+/.test(email) && accepted
 
@@ -74,10 +74,10 @@ export const ConfirmDetailsStep = ({ selectedProviderIds, onBack, onSubmit }: Pr
       </div>
 
       <div className="rounded-2xl bg-white p-5 shadow-sm">
-        <h4 className="text-base font-semibold text-gray-900 mb-3">Ausgewählte Verbindungen</h4>
+        <h4 className="text-base font-semibold text-gray-900 mb-3">Ausgewählte Partner</h4>
         <div className="min-h-0">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {selectedProviders.map((provider) => (
+            {selectedPartners.map((provider) => (
               <div key={provider!.id} className="flex h-28 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 {provider!.logoUrl || provider!.domain ? (
