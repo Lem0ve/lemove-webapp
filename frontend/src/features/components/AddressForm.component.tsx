@@ -5,14 +5,14 @@ export type Address = { street: string; postalCode: string; city: string }
 type Props = {
   title: string
   value: Address
-  onChange: (a: Address) => void
+  onChange: (address: Address) => void
   onNext?: () => void
   idPrefix?: string
 }
 
 export const AddressForm: React.FC<Props> = ({ title, value, onChange, onNext, idPrefix = '' }) => {
-  const a = value
-  const valid = Boolean(a.street && a.postalCode && a.city)
+  const address = value
+  const valid = Boolean(address.street && address.postalCode && address.city)
   const prefix = idPrefix ? `${idPrefix}-` : ''
 
   return (
@@ -25,8 +25,8 @@ export const AddressForm: React.FC<Props> = ({ title, value, onChange, onNext, i
             id={`${prefix}street`}
             className="rounded-xl border border-gray-300 p-2"
             autoComplete="address-line1"
-            value={a.street}
-            onChange={(e) => onChange({ ...a, street: e.target.value })}
+            value={address.street}
+            onChange={(event) => onChange({ ...address, street: event.target.value })}
           />
         </label>
         <label htmlFor={`${prefix}postal`} className="grid gap-1 text-sm">
@@ -35,8 +35,8 @@ export const AddressForm: React.FC<Props> = ({ title, value, onChange, onNext, i
             id={`${prefix}postal`}
             className="rounded-xl border border-gray-300 p-2"
             autoComplete="postal-code"
-            value={a.postalCode}
-            onChange={(e) => onChange({ ...a, postalCode: e.target.value })}
+            value={address.postalCode}
+            onChange={(event) => onChange({ ...address, postalCode: event.target.value })}
           />
         </label>
         <label htmlFor={`${prefix}city`} className="grid gap-1 text-sm">
@@ -45,8 +45,8 @@ export const AddressForm: React.FC<Props> = ({ title, value, onChange, onNext, i
             id={`${prefix}city`}
             className="rounded-xl border border-gray-300 p-2"
             autoComplete="address-level2"
-            value={a.city}
-            onChange={(e) => onChange({ ...a, city: e.target.value })}
+            value={address.city}
+            onChange={(event) => onChange({ ...address, city: event.target.value })}
           />
         </label>
       </div>
@@ -64,4 +64,3 @@ export const AddressForm: React.FC<Props> = ({ title, value, onChange, onNext, i
     </div>
   )
 }
-

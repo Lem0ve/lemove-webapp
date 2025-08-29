@@ -30,13 +30,13 @@ export const Sidebar = ({ activeStep, stepCompletion, onStepNavigate, onEditProf
         </button>
       </div>
       <nav className="flex flex-col gap-2">
-        {STEPS.map((step, idx) => {
-          const isActive = idx === activeStep
+        {STEPS.map((step, index) => {
+          const isActive = index === activeStep
           const isDone = stepCompletion[step.key]
           return (
             <button
               key={step.key}
-              onClick={() => onStepNavigate?.(idx)}
+              onClick={() => onStepNavigate?.(index)}
               className={
                 'flex items-center justify-between rounded-xl border px-3 py-2 text-left text-sm ' +
                 (isActive ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-800 hover:bg-gray-50')

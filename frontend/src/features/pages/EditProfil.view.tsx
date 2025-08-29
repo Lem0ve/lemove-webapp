@@ -13,18 +13,18 @@ export const EditProfilView: React.FC<{ onClose: () => void }> = ({ onClose }) =
         </div>
         <div className="space-y-10">
           <section>
-            <AddressForm title="Auszugsadresse" value={move.oldAddress} onChange={(a) => actions.setMove({ oldAddress: a })} idPrefix="old" />
+            <AddressForm title="Auszugsadresse" value={move.oldAddress} onChange={(address) => actions.setMove({ oldAddress: address })} idPrefix="old" />
           </section>
           <section>
-            <AddressForm title="Einzugsadresse" value={move.newAddress} onChange={(a) => actions.setMove({ newAddress: a })} idPrefix="new" />
+            <AddressForm title="Einzugsadresse" value={move.newAddress} onChange={(address) => actions.setMove({ newAddress: address })} idPrefix="new" />
           </section>
           <section>
             <div className="space-y-4">
               <MoveDate
                 alreadyMoved={!!move.alreadyMoved}
                 date={move.moveDate ?? ''}
-                onToggle={(v) => actions.setMove({ alreadyMoved: v })}
-                onChangeDate={(v) => actions.setMove({ moveDate: v })}
+                onToggle={(value) => actions.setMove({ alreadyMoved: value })}
+                onChangeDate={(dateValue) => actions.setMove({ moveDate: dateValue })}
               />
             </div>
           </section>

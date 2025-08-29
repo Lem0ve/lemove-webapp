@@ -33,9 +33,9 @@ export const OnboardingView: React.FC = () => {
         <div className="mb-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="flex items-center justify-center gap-2 flex-wrap">
-              {ONBOARDING_STEPS.map((step, idx) => {
-                const unlocked = idx <= (stepCompletion.old ? (stepCompletion.new ? 2 : 1) : 0)
-                const active = idx === activeStep
+              {ONBOARDING_STEPS.map((step, index) => {
+                const unlocked = index <= (stepCompletion.old ? (stepCompletion.new ? 2 : 1) : 0)
+                const active = index === activeStep
                 const done = step.key === 'old' ? stepCompletion.old : step.key === 'new' ? stepCompletion.new : stepCompletion.date
                 const base = 'inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-sm font-medium transition-colors'
                 const state = active
@@ -48,7 +48,7 @@ export const OnboardingView: React.FC = () => {
                     key={step.key}
                     type="button"
                     disabled={!unlocked}
-                    onClick={() => unlocked && setActiveStep(idx)}
+                    onClick={() => unlocked && setActiveStep(index)}
                     className={`${base} ${state}`}
                     aria-current={active ? 'step' : undefined}
                   >
@@ -65,7 +65,7 @@ export const OnboardingView: React.FC = () => {
             <AddressForm
               title="Auszugsadresse"
               value={move.oldAddress}
-              onChange={(a) => actions.setMove({ oldAddress: a })}
+              onChange={(address) => actions.setMove({ oldAddress: address })}
               onNext={() => setActiveStep(1)}
               idPrefix="old"
             />
@@ -74,7 +74,7 @@ export const OnboardingView: React.FC = () => {
             <AddressForm
               title="Einzugsadresse"
               value={move.newAddress}
-              onChange={(a) => actions.setMove({ newAddress: a })}
+              onChange={(address) => actions.setMove({ newAddress: address })}
               onNext={() => setActiveStep(2)}
               idPrefix="new"
             />
@@ -83,8 +83,8 @@ export const OnboardingView: React.FC = () => {
             <MoveDate
               alreadyMoved={!!move.alreadyMoved}
               date={move.moveDate ?? ''}
-              onToggle={(v) => actions.setMove({ alreadyMoved: v })}
-              onChangeDate={(v) => actions.setMove({ moveDate: v })}
+              onToggle={(value) => actions.setMove({ alreadyMoved: value })}
+              onChangeDate={(dateValue) => actions.setMove({ moveDate: dateValue })}
               onDone={() => {
                 try { localStorage.setItem('onboarding_done', '1') } catch {}
                 navigate('/', { replace: true })

@@ -17,7 +17,7 @@ export const MoveDate: React.FC<{
           <input
             type="checkbox"
             checked={already}
-            onChange={(e) => onToggle(e.target.checked)}
+            onChange={(event) => onToggle(event.target.checked)}
           />
           Schon umgezogen
         </label>
@@ -30,7 +30,7 @@ export const MoveDate: React.FC<{
               type="date"
               className="rounded-xl border border-gray-300 p-2"
               value={date}
-              onChange={(e) => onChangeDate(e.target.value)}
+              onChange={(event) => onChangeDate(event.target.value)}
             />
           </label>
         </div>

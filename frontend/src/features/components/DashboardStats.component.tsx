@@ -6,8 +6,8 @@ export const DashboardStats = () => {
 
   const kpi = useMemo(() => {
     const total = connections.length
-    const sent = connections.filter((c) => c.status === 'sent').length
-    const confirmed = connections.filter((c) => c.status === 'confirmed' || c.status === 'manual_done').length
+    const sent = connections.filter((connection) => connection.status === 'sent').length
+    const confirmed = connections.filter((connection) => connection.status === 'confirmed' || connection.status === 'manual_done').length
     const open = total - confirmed
     return { total, sent, confirmed, open }
   }, [connections])

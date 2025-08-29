@@ -52,8 +52,8 @@ export const HomeView = () => {
             activeStep={activeStep}
             stepCompletion={stepCompletion}
             onEditProfile={() => setShowEditProfile(true)}
-            onStepNavigate={(idx: number) => {
-              if (idx <= highestUnlockedStep) setActiveStep(idx)
+            onStepNavigate={(index: number) => {
+              if (index <= highestUnlockedStep) setActiveStep(index)
             }}
           />
         </div>
@@ -77,14 +77,17 @@ export const HomeView = () => {
                   selectedProviderIds={pendingProviderIds}
                   onBack={() => setUiMode('pick-providers')}
                   onSubmit={() => {
-                    const existingNames = new Set<string>(connections.map(c => c.name.toLowerCase()))
-                    pendingProviderIds.forEach(id => {
-                      const p = PROVIDERS.find(x => x.id === id)
-                      if (!p) return
-                      if (!existingNames.has(p.name.toLowerCase())) {
-                        actions.addConnection({ name: p.name, category: p.category, customerId: undefined })
-                        existingNames.add(p.name.toLowerCase())
-                      }
+                    const existingProviderIds = new Set<string>(connections.map(connection => (connection.providerId ?? '').toLowerCase()).filter(Boolean))
+                    const legacyNames = new Set<string>(connections.filter(connection => !connection.providerId).map(connection => connection.name.toLowerCase()))
+                    pendingProviderIds.forEach(providerId => {
+                      const provider = PROVIDERS.find(providerItem => providerItem.id === providerId)
+                      if (!provider) return
+                      const idKey = provider.id.toLowerCase()
+                      const nameKey = provider.name.toLowerCase()
+                      const exists = existingProviderIds.has(idKey) || legacyNames.has(nameKey)
+                      if (exists) return
+                      actions.addConnection({ providerId: provider.id, name: provider.name, category: provider.category, customerId: undefined })
+                      existingProviderIds.add(idKey)
                     })
                     setPendingProviderIds([])
                     setUiMode('dashboard')

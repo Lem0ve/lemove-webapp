@@ -5,7 +5,9 @@ import { StatusIcon, statusBadgeColor, clsx } from './ConnectionStatus.utils'
 import { PROVIDERS, brandLogoUrl } from './ProviderCatalog'
 
 export const ConnectionCard = ({ item, onUpdate, onRemove }: { item: Connection; onUpdate: (patch: Partial<Connection>) => void; onRemove: () => void }) => {
-  const provider = PROVIDERS.find((p) => p.name.toLowerCase() === item.name.toLowerCase())
+  const provider = item.providerId
+    ? PROVIDERS.find((providerItem) => providerItem.id === item.providerId)
+    : PROVIDERS.find((providerItem) => providerItem.name.toLowerCase() === item.name.toLowerCase())
   const logoSrc = provider?.logoUrl || (provider?.domain ? brandLogoUrl(provider.domain, 24, { format: 'svg' }) : undefined)
 
   return (
@@ -16,8 +18,8 @@ export const ConnectionCard = ({ item, onUpdate, onRemove }: { item: Connection;
             {logoSrc ? (
               <img
                 src={logoSrc}
-                onError={(e) => {
-                  const img = e.currentTarget as HTMLImageElement
+                onError={(event) => {
+                  const img = event.currentTarget as HTMLImageElement
                   if (provider?.domain) {
                     img.src = brandLogoUrl(provider.domain, 24, { dpr: 2 })
                     img.onerror = () => { img.src = `https://logo.clearbit.com/${provider.domain}` }

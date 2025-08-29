@@ -38,6 +38,7 @@ const HomeCtx = createContext<(HomeState & { actions: HomeActions }) | null>(nul
 
 export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   const STORAGE_KEY = 'move_state_v1'
+  const CONNECTIONS_KEY = 'connections_v1'
   const defaultMove: MoveState = {
     oldAddress: { street: '', postalCode: '', city: '' },
     newAddress: { street: '', postalCode: '', city: '' },
@@ -67,10 +68,34 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
       return defaultMove
     }
   })
-  const [connections, setConnections] = useState<Connection[]>([])
+  const [connections, setConnections] = useState<Connection[]>(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(CONNECTIONS_KEY) : null
+      if (!raw) return []
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return []
+      return parsed
+        .filter((item) => item && typeof item === 'object')
+        .map((item) => {
+          const safe: Connection = {
+            id: String(item.id ?? ''),
+            providerId: item.providerId ? String(item.providerId) : undefined,
+            name: String(item.name ?? ''),
+            category: (item.category ?? 'Sonstiges') as any,
+            customerId: item.customerId != null ? String(item.customerId) : undefined,
+            status: (item.status ?? 'not_contacted') as any,
+          }
+          return safe
+        })
+        .filter((item) => item.id && item.name)
+    } catch {
+      return []
+    }
+  })
   const [isDispatching, setIsDispatching] = useState(false)
   const timerRef = useRef<number | null>(null)
   const persistTimerRef = useRef<number | null>(null)
+  const connectionsPersistTimerRef = useRef<number | null>(null)
 
   const setMove = (patch: Partial<MoveState>) => setMoveState((m) => ({ ...m, ...patch }))
 
@@ -85,8 +110,8 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   const isAddressComplete = useMemo(() => {
-    const filled = (x: Address) => x.street && x.postalCode && x.city
-    return filled(move.oldAddress) && filled(move.newAddress)
+    const isFilled = (address: Address) => address.street && address.postalCode && address.city
+    return isFilled(move.oldAddress) && isFilled(move.newAddress)
   }, [move])
 
   const startDispatch = () => {
@@ -95,14 +120,14 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
     setConnections((prev) => HomeInteractor.beginDispatch(prev))
     const tick = () => {
       setConnections((prev) => HomeInteractor.tickDispatch(prev))
-      setConnections((curr) => {
-        const anyLeft = curr.some((c) => c.status === 'sent' || c.status === 'not_contacted')
+      setConnections((currentConnections) => {
+        const anyLeft = currentConnections.some((connection) => connection.status === 'sent' || connection.status === 'not_contacted')
         if (!anyLeft) {
           if (timerRef.current) window.clearInterval(timerRef.current)
           timerRef.current = null
           setIsDispatching(false)
         }
-        return curr
+        return currentConnections
       })
     }
     timerRef.current = window.setInterval(tick, 1200)
@@ -111,6 +136,7 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => () => {
     if (timerRef.current) window.clearInterval(timerRef.current)
     if (persistTimerRef.current) window.clearTimeout(persistTimerRef.current)
+    if (connectionsPersistTimerRef.current) window.clearTimeout(connectionsPersistTimerRef.current)
   }, [])
 
   useEffect(() => {
@@ -122,6 +148,15 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
       } catch { }
     }, 300)
   }, [move])
+
+  useEffect(() => {
+    if (connectionsPersistTimerRef.current) window.clearTimeout(connectionsPersistTimerRef.current)
+    connectionsPersistTimerRef.current = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(connections))
+      } catch { }
+    }, 200)
+  }, [connections])
 
   return (
     <HomeCtx.Provider value={{ move, connections, isDispatching, actions: { setMove, addConnection, updateConnection, removeConnection, startDispatch } }}>

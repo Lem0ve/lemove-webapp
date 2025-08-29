@@ -11,8 +11,8 @@ export const Connections = ({ onStartAdd }: Props) => {
         <div className="space-y-4">
             <h3 className="text-base font-semibold text-gray-900">Meine Verbindungen</h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {connections.map((r) => (
-                    <ConnectionCard key={r.id} item={r} onUpdate={(patch) => actions.updateConnection(r.id, patch)} onRemove={() => actions.removeConnection(r.id)} />
+                {connections.map((connection) => (
+                    <ConnectionCard key={connection.id} item={connection} onUpdate={(patch) => actions.updateConnection(connection.id, patch)} onRemove={() => actions.removeConnection(connection.id)} />
                 ))}
 
                 {/* Add tile at the end */}

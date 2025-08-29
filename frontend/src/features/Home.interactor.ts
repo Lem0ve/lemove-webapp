@@ -4,6 +4,7 @@ export type ConnectionStatus = 'not_contacted' | 'sent' | 'confirmed' | 'manual_
 
 export type Connection = {
   id: string
+  providerId?: string
   name: string
   category: ProviderCategory
   customerId?: string
@@ -13,32 +14,32 @@ export type Connection = {
 export const HomeInteractor = {
   newId: () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2)),
 
-  add(conns: Connection[], input: Omit<Connection, 'id' | 'status'> & { status?: ConnectionStatus }): Connection[] {
+  add(connections: Connection[], input: Omit<Connection, 'id' | 'status'> & { status?: ConnectionStatus }): Connection[] {
     const id = HomeInteractor.newId()
-    return [{ id, status: input.status ?? 'not_contacted', ...input }, ...conns]
+    return [{ id, status: input.status ?? 'not_contacted', ...input }, ...connections]
   },
 
-  update(conns: Connection[], id: string, patch: Partial<Connection>): Connection[] {
-    return conns.map((c) => (c.id === id ? { ...c, ...patch } : c))
+  update(connections: Connection[], id: string, patch: Partial<Connection>): Connection[] {
+    return connections.map((connection) => (connection.id === id ? { ...connection, ...patch } : connection))
   },
 
-  remove(conns: Connection[], id: string): Connection[] {
-    return conns.filter((c) => c.id !== id)
+  remove(connections: Connection[], id: string): Connection[] {
+    return connections.filter((connection) => connection.id !== id)
   },
 
-  beginDispatch(conns: Connection[]): Connection[] {
-    return conns.map((c) => (c.status === 'not_contacted' ? { ...c, status: 'sent' } : c))
+  beginDispatch(connections: Connection[]): Connection[] {
+    return connections.map((connection) => (connection.status === 'not_contacted' ? { ...connection, status: 'sent' } : connection))
   },
 
-  tickDispatch(conns: Connection[]): Connection[] {
+  tickDispatch(connections: Connection[]): Connection[] {
     let changed = false
-    const next = conns.map((c) => {
-      if (c.status === 'sent' && Math.random() < 0.35) {
+    const next = connections.map((connection) => {
+      if (connection.status === 'sent' && Math.random() < 0.35) {
         changed = true
-        return { ...c, status: 'confirmed' as ConnectionStatus }
+        return { ...connection, status: 'confirmed' as ConnectionStatus }
       }
-      return c
+      return connection
     })
-    return changed ? next : conns
+    return changed ? next : connections
   },
 }

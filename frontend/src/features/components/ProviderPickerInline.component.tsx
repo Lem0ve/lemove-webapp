@@ -13,9 +13,9 @@ export const ProviderPickerInline = ({ onCancel, onConfirm }: Props) => {
   const [selected, setSelected] = useState<Set<string>>(new Set())
 
   const filtered = useMemo(() => {
-    const list = activeCategory === 'Alle' ? PROVIDERS : PROVIDERS.filter(p => p.category === activeCategory)
-    const q = query.trim().toLowerCase()
-    return q ? list.filter(p => p.name.toLowerCase().includes(q)) : list
+    const list = activeCategory === 'Alle' ? PROVIDERS : PROVIDERS.filter(provider => provider.category === activeCategory)
+    const queryLower = query.trim().toLowerCase()
+    return queryLower ? list.filter(provider => provider.name.toLowerCase().includes(queryLower)) : list
   }, [activeCategory, query])
 
   function toggle(id: string) {
@@ -36,20 +36,20 @@ export const ProviderPickerInline = ({ onCancel, onConfirm }: Props) => {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(event) => setQuery(event.target.value)}
             placeholder="Suchen..."
             aria-label="Anbieter suchen"
             className="w-full rounded-xl border border-gray-300 p-2 pl-9 outline-none focus:ring-2 focus:ring-gray-900"
           />
         </div>
         <div className="sm:col-span-2 flex flex-wrap gap-2">
-          {(['Alle', ...CATEGORIES] as const).map((c) => (
+          {(['Alle', ...CATEGORIES] as const).map((category) => (
             <button
-              key={c}
-              onClick={() => setActiveCategory(c as any)}
-              className={`rounded-full px-3 py-1 text-xs ${activeCategory === c ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              key={category}
+              onClick={() => setActiveCategory(category as any)}
+              className={`rounded-full px-3 py-1 text-xs ${activeCategory === category ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
-              {c}
+              {category}
             </button>
           ))}
         </div>
@@ -57,41 +57,41 @@ export const ProviderPickerInline = ({ onCancel, onConfirm }: Props) => {
 
       <div className="min-h-0 max-h-[60vh] overflow-auto">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {filtered.map((p) => {
-            const isChecked = selected.has(p.id)
+          {filtered.map((provider) => {
+            const isChecked = selected.has(provider.id)
             return (
               <div
-                key={p.id}
-                onClick={() => toggle(p.id)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(p.id) } }}
+                key={provider.id}
+                onClick={() => toggle(provider.id)}
+                onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(provider.id) } }}
                 role="checkbox"
                 aria-checked={isChecked}
                 tabIndex={0}
                 className={`relative flex h-28 flex-col items-center justify-center rounded-xl border p-2 text-sm cursor-pointer ${isChecked ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:bg-gray-50'}`}
               >
-                <input type="checkbox" checked={isChecked} onChange={() => toggle(p.id)} className="sr-only" aria-label={`${p.name} auswählen`} />
+                <input type="checkbox" checked={isChecked} onChange={() => toggle(provider.id)} className="sr-only" aria-label={`${provider.name} auswählen`} />
                 <button
                   type="button"
-                  onClick={(e) => { e.stopPropagation(); toggle(p.id) }}
+                  onClick={(event) => { event.stopPropagation(); toggle(provider.id) }}
                   className={`absolute right-2 top-2 h-5 w-5 rounded-full border-2 ${isChecked ? 'border-gray-900 bg-gray-900' : 'border-gray-300 bg-white'} flex items-center justify-center`}
                   aria-label={isChecked ? 'Ausgewählt' : 'Auswählen'}
                 >
                   {isChecked && <Check className="h-3 w-3 text-white" />}
                 </button>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {p.logoUrl || p.domain ? (
+                {provider.logoUrl || provider.domain ? (
                   <img
-                    src={p.logoUrl || (p.domain ? brandLogoUrl(p.domain, 64, { format: 'svg' }) : '')}
-                    onError={(e) => {
-                      const img = e.currentTarget as HTMLImageElement
-                      if (p.domain) {
-                        img.src = brandLogoUrl(p.domain, 64, { dpr: 2 })
-                        img.onerror = () => { img.src = `https://logo.clearbit.com/${p.domain}` }
+                    src={provider.logoUrl || (provider.domain ? brandLogoUrl(provider.domain, 64, { format: 'svg' }) : '')}
+                    onError={(event) => {
+                      const img = event.currentTarget as HTMLImageElement
+                      if (provider.domain) {
+                        img.src = brandLogoUrl(provider.domain, 64, { dpr: 2 })
+                        img.onerror = () => { img.src = `https://logo.clearbit.com/${provider.domain}` }
                       } else {
                         img.src = ''
                       }
                     }}
-                    alt={p.name}
+                    alt={provider.name}
                     className="h-12 w-auto max-w-[80px] object-contain"
                   />
                 ) : (
