@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const MoveDate: React.FC<{
   alreadyMoved: boolean
@@ -39,13 +40,13 @@ export const MoveDate: React.FC<{
           {(() => {
             const disabled = !already && !date
             return (
-              <button
+              <Link
+                to="/"
                 className={`rounded-xl px-4 py-2 text-sm font-semibold ${disabled ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-gray-900 text-white hover:bg-black'}`}
-                onClick={() => onDone?.()}
-                disabled={disabled}
+                onClick={() => !disabled && onDone?.()}
               >
                 Fertig
-              </button>
+              </Link>
             )
           })()}
         </div>
