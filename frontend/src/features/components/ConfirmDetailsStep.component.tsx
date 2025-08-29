@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useHome } from '../Home.context'
-import { PROVIDERS } from './ProviderCatalog'
+import { PROVIDERS, brandLogoUrl } from './ProviderCatalog'
 
  type Props = {
   selectedProviderIds: string[]
@@ -26,7 +26,7 @@ export const ConfirmDetailsStep = ({ selectedProviderIds, onBack, onSubmit }: Pr
   const [moveDate, setMoveDate] = useState(move.moveDate ?? '')
   const [accepted, setAccepted] = useState(false)
 
-  const selectedProviders = useMemo(() => selectedProviderIds.map(id => PROVIDERS.find(p => p.id === id)).filter(Boolean), [selectedProviderIds])
+  const selectedProviders = selectedProviderIds.map(id => PROVIDERS.find(p => p.id === id)).filter(Boolean)
 
   const isValid = fullName.trim().length > 0 && /.+@.+\..+/.test(email) && accepted
 
@@ -75,20 +75,32 @@ export const ConfirmDetailsStep = ({ selectedProviderIds, onBack, onSubmit }: Pr
 
       <div className="rounded-2xl bg-white p-5 shadow-sm">
         <h4 className="text-base font-semibold text-gray-900 mb-3">Ausgewählte Verbindungen</h4>
-        <div className="flex flex-wrap gap-3">
-          {selectedProviders.map((p) => (
-            <div key={p!.id} className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {p!.logoUrl ? (
-                <img src={p!.logoUrl} alt={p!.name} className="h-6 w-auto" />
-              ) : p!.domain ? (
-                <img src={`https://logo.clearbit.com/${p!.domain}`} alt={p!.name} className="h-6 w-auto" />
-              ) : (
-                <div className="h-6 w-6 rounded-full bg-gray-200" />
-              )}
-              <span className="text-sm text-gray-800">{p!.name}</span>
-            </div>
-          ))}
+        <div className="min-h-0">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {selectedProviders.map((p) => (
+              <div key={p!.id} className="flex h-28 flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {p!.logoUrl || p!.domain ? (
+                  <img
+                    src={p!.logoUrl || (p!.domain ? brandLogoUrl(p!.domain, 64, { format: 'svg' }) : '')}
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement
+                      if (p!.domain) {
+                        img.src = brandLogoUrl(p!.domain, 64, { dpr: 2 })
+                        img.onerror = () => { img.src = `https://logo.clearbit.com/${p!.domain}` }
+                      } else {
+                        img.src = ''
+                      }
+                    }}
+                    alt={p!.name}
+                    className="h-12 w-auto max-w-[80px] object-contain"
+                  />
+                ) : (
+                  <div className="h-12 w-12 rounded-full bg-gray-200" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

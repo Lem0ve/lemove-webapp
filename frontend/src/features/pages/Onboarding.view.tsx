@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MoveDate } from '../components/MoveDate.component'
-import { NewAddress } from '../components/NewAddress.component'
-import { OldAddress } from '../components/OldAddress.component'
+import { AddressForm } from '../components/AddressForm.component'
 import { useHome } from '../Home.context'
 
 export const OnboardingView: React.FC = () => {
@@ -63,17 +62,21 @@ export const OnboardingView: React.FC = () => {
         </div>
         <div className="space-y-6">
           {activeStep === 0 && (
-            <OldAddress
+            <AddressForm
+              title="Auszugsadresse"
               value={move.oldAddress}
               onChange={(a) => actions.setMove({ oldAddress: a })}
               onNext={() => setActiveStep(1)}
+              idPrefix="old"
             />
           )}
           {activeStep === 1 && (
-            <NewAddress
+            <AddressForm
+              title="Einzugsadresse"
               value={move.newAddress}
               onChange={(a) => actions.setMove({ newAddress: a })}
               onNext={() => setActiveStep(2)}
+              idPrefix="new"
             />
           )}
           {activeStep === 2 && (

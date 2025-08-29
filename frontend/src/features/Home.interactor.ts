@@ -11,7 +11,7 @@ export type Connection = {
 }
 
 export const HomeInteractor = {
-  newId: () => Math.random().toString(36).slice(2),
+  newId: () => (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2)),
 
   add(conns: Connection[], input: Omit<Connection, 'id' | 'status'> & { status?: ConnectionStatus }): Connection[] {
     const id = HomeInteractor.newId()
@@ -26,12 +26,10 @@ export const HomeInteractor = {
     return conns.filter((c) => c.id !== id)
   },
 
-  // Mark every not_contacted as sent when dispatch starts
   beginDispatch(conns: Connection[]): Connection[] {
     return conns.map((c) => (c.status === 'not_contacted' ? { ...c, status: 'sent' } : c))
   },
 
-  // Randomly confirm a portion of 'sent' connections to simulate async progress
   tickDispatch(conns: Connection[]): Connection[] {
     let changed = false
     const next = conns.map((c) => {

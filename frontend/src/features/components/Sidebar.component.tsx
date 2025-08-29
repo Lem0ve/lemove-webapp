@@ -26,7 +26,7 @@ export const Sidebar = ({ activeStep, stepCompletion, onStepNavigate, onEditProf
           aria-label="Profil bearbeiten"
         >
           <Pencil className="h-3.5 w-3.5" />
-          Edit
+          Bearbeiten
         </button>
       </div>
       <nav className="flex flex-col gap-2">

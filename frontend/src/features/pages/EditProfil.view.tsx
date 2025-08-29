@@ -1,7 +1,6 @@
 import React from 'react'
 import { MoveDate } from '../components/MoveDate.component'
-import { NewAddress } from '../components/NewAddress.component'
-import { OldAddress } from '../components/OldAddress.component'
+import { AddressForm } from '../components/AddressForm.component'
 import { useHome } from '../Home.context'
 
 export const EditProfilView: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -14,10 +13,10 @@ export const EditProfilView: React.FC<{ onClose: () => void }> = ({ onClose }) =
         </div>
         <div className="space-y-10">
           <section>
-            <OldAddress value={move.oldAddress} onChange={(a) => actions.setMove({ oldAddress: a })} />
+            <AddressForm title="Auszugsadresse" value={move.oldAddress} onChange={(a) => actions.setMove({ oldAddress: a })} idPrefix="old" />
           </section>
           <section>
-            <NewAddress value={move.newAddress} onChange={(a) => actions.setMove({ newAddress: a })} />
+            <AddressForm title="Einzugsadresse" value={move.newAddress} onChange={(a) => actions.setMove({ newAddress: a })} idPrefix="new" />
           </section>
           <section>
             <div className="space-y-4">
@@ -34,7 +33,7 @@ export const EditProfilView: React.FC<{ onClose: () => void }> = ({ onClose }) =
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-gray-900 px-5 py-2 text-sm font-semibold text-white hover:bg-black"
+            className="cursor-pointer rounded-xl bg-gray-900 px-5 py-2 text-sm font-semibold text-white hover:bg-black"
           >
             Speichern & Schließen
           </button>

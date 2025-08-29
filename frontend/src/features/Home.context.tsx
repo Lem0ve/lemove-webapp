@@ -2,7 +2,12 @@ import { createContext, useContext, useMemo, useRef, useState, useEffect } from 
 import type { Connection, ConnectionStatus } from './Home.interactor'
 import { HomeInteractor } from './Home.interactor'
 
-export type Address = { street: string; postalCode: string; city: string }
+export type Address = {
+  street: string;
+  postalCode: string;
+  city: string;
+}
+
 export type MoveState = {
   oldAddress: Address
   newAddress: Address
@@ -32,20 +37,40 @@ type HomeActions = {
 const HomeCtx = createContext<(HomeState & { actions: HomeActions }) | null>(null)
 
 export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [move, setMoveState] = useState<MoveState>({
+  const STORAGE_KEY = 'move_state_v1'
+  const defaultMove: MoveState = {
     oldAddress: { street: '', postalCode: '', city: '' },
     newAddress: { street: '', postalCode: '', city: '' },
     moveDate: '',
     proofFile: null,
-  alreadyMoved: false,
-  fullName: '',
-  email: '',
-  phone: '',
-  birthday: '',
+    alreadyMoved: false,
+    fullName: '',
+    email: '',
+    phone: '',
+    birthday: '',
+  }
+
+  const [move, setMoveState] = useState<MoveState>(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? window.localStorage.getItem(STORAGE_KEY) : null
+      if (!raw) return defaultMove
+      const parsed = JSON.parse(raw) as Partial<MoveState>
+      return {
+        ...defaultMove,
+        ...parsed,
+        oldAddress: { ...defaultMove.oldAddress, ...(parsed?.oldAddress ?? {}) },
+        newAddress: { ...defaultMove.newAddress, ...(parsed?.newAddress ?? {}) },
+        moveDate: typeof parsed?.moveDate === 'string' ? parsed!.moveDate : defaultMove.moveDate,
+        alreadyMoved: typeof parsed?.alreadyMoved === 'boolean' ? parsed!.alreadyMoved! : defaultMove.alreadyMoved,
+      }
+    } catch {
+      return defaultMove
+    }
   })
   const [connections, setConnections] = useState<Connection[]>([])
   const [isDispatching, setIsDispatching] = useState(false)
   const timerRef = useRef<number | null>(null)
+  const persistTimerRef = useRef<number | null>(null)
 
   const setMove = (patch: Partial<MoveState>) => setMoveState((m) => ({ ...m, ...patch }))
 
@@ -70,7 +95,6 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
     setConnections((prev) => HomeInteractor.beginDispatch(prev))
     const tick = () => {
       setConnections((prev) => HomeInteractor.tickDispatch(prev))
-      // stop when all are done (no 'sent' or 'not_contacted')
       setConnections((curr) => {
         const anyLeft = curr.some((c) => c.status === 'sent' || c.status === 'not_contacted')
         if (!anyLeft) {
@@ -86,7 +110,18 @@ export const HomeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => () => {
     if (timerRef.current) window.clearInterval(timerRef.current)
+    if (persistTimerRef.current) window.clearTimeout(persistTimerRef.current)
   }, [])
+
+  useEffect(() => {
+    if (persistTimerRef.current) window.clearTimeout(persistTimerRef.current)
+    persistTimerRef.current = window.setTimeout(() => {
+      try {
+        const toSave: Omit<MoveState, 'proofFile'> & { proofFile: null } = { ...move, proofFile: null }
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
+      } catch { }
+    }, 300)
+  }, [move])
 
   return (
     <HomeCtx.Provider value={{ move, connections, isDispatching, actions: { setMove, addConnection, updateConnection, removeConnection, startDispatch } }}>
